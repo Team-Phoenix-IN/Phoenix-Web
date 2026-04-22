@@ -276,7 +276,7 @@ button {
 }
 
 /* ===== NAV RESPONSIVE ===== */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
     #main-nav {
         padding: 0 16px;
         gap: 12px;
@@ -291,19 +291,19 @@ button {
         top: 0;
         left: 0;
         bottom: 0;
-        width: 280px;
+        width: 100vw !important;
+        height: 100vh !important;
         flex-direction: column;
         align-items: flex-start;
         justify-content: flex-start;
         gap: 0;
         padding: 90px 24px 40px;
-        background: #000000;
+        background-color: #000000 !important;
         transform: translateX(-100%);
         visibility: hidden;
         opacity: 0;
         transition: transform 0.45s var(--ease-out-expo), opacity 0.35s ease, visibility 0s 0.5s;
         z-index: 1100;
-        border-right: 1px solid var(--border-subtle);
     }
 
     .nav-links.open {
@@ -311,34 +311,6 @@ button {
         opacity: 1;
         visibility: visible;
         transition: transform 0.45s var(--ease-out-expo), opacity 0.35s ease, visibility 0s 0s;
-    }
-
-    /* Backdrop overlay */
-    .nav-links.open::before {
-        content: '';
-        position: fixed;
-        top: 0;
-        left: 280px;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: -1;
-    }
-
-    /* Phoenix logo watermark */
-    .nav-links::after {
-        content: '';
-        position: absolute;
-        bottom: 30px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 180px;
-        height: 180px;
-        background: url('assets/images/phoenix-logo.png') no-repeat center center;
-        background-size: contain;
-        opacity: 0.06;
-        pointer-events: none;
-        z-index: 0;
     }
 
     /* Nav links inside mobile menu */
@@ -390,15 +362,16 @@ button {
         padding: 10px 24px;
         font-size: 13px;
         font-weight: 500;
-        color: rgba(255, 255, 255, 0.5);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #fff;
+        border: 1px solid rgba(88, 101, 242, 0.6);
+        background: rgba(88, 101, 242, 0.15);
+        box-shadow: 0 0 24px rgba(88, 101, 242, 0.3);
         border-radius: 50px;
         letter-spacing: 0.5px;
         text-decoration: none;
         opacity: 0;
         transform: translateX(-40px);
-        transition: opacity 0.35s ease, transform 0.4s var(--ease-out-expo),
-                    border-color 0.3s ease, color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+        transition: opacity 0.35s ease, transform 0.4s var(--ease-out-expo);
         position: relative;
         z-index: 1;
     }
@@ -407,15 +380,6 @@ button {
         opacity: 1;
         transform: translateX(0);
         transition-delay: 0.36s;
-    }
-
-    .nav-mobile-discord:hover {
-        color: #fff;
-        border-color: rgba(88, 101, 242, 0.6);
-        background: rgba(88, 101, 242, 0.15);
-        box-shadow: 0 0 24px rgba(88, 101, 242, 0.3);
-        transform: translateX(0) scale(1.08);
-        padding-left: 28px;
     }
 }
 
@@ -482,6 +446,22 @@ button {
     max-width: 840px;
     height: 320px;
     margin-top: 120px;
+}
+
+@media (max-width: 768px) {
+    .hero-logo-wrapper {
+        transform: scale(0.75);
+        margin-top: 80px;
+        height: 240px;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-logo-wrapper {
+        transform: scale(0.55);
+        margin-top: 50px;
+        height: 180px;
+    }
 }
 
 /* Fixed logo - no hover, no cursor, positioned within wings */
@@ -639,9 +619,9 @@ button {
 
 /* Hero Text */
 .hero-title {
-    font-size: 64px;
+    font-size: clamp(36px, 8vw, 64px);
     font-weight: 900;
-    letter-spacing: 14px;
+    letter-spacing: clamp(4px, 2vw, 14px);
     text-transform: uppercase;
     opacity: 0;
     transform: translateY(20px);
@@ -663,9 +643,9 @@ button {
 }
 
 .hero-subtitle {
-    font-size: 14px;
+    font-size: clamp(10px, 2vw, 14px);
     font-weight: 400;
-    letter-spacing: 8px;
+    letter-spacing: clamp(3px, 1.5vw, 8px);
     color: var(--text-muted);
     text-transform: uppercase;
     opacity: 0;
@@ -1439,6 +1419,7 @@ button {
     line-height: 1.4;
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -3147,7 +3128,7 @@ body.profile-open .page { pointer-events: none; }
 }
 
 /* ===== AUTH BUTTON (dt-only helper) ===== */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
     .dt-only { display: none !important; }
     #auth-text { display: none !important; }
     #auth-btn {
