@@ -1631,6 +1631,20 @@ button {
     opacity: 0.6;
 }
 
+@media (min-width: 901px) {
+    .coach-card {
+        grid-column: 2;
+    }
+}
+
+@media (max-width: 900px) and (min-width: 601px) {
+    .coach-card {
+        grid-column: 1 / -1;
+        justify-self: center;
+        width: calc(50% - 10px);
+    }
+}
+
 /* ===== ROSTER SOCIAL OVERLAY ===== */
 .roster-social-overlay {
     position: absolute;
@@ -1991,7 +2005,7 @@ button {
 .tracker-region-select {
     padding: 12px 14px;
     background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 120, 0, 0.2);
     border-radius: 8px;
     color: #fff;
     font-size: 13px;
@@ -1999,6 +2013,28 @@ button {
     letter-spacing: 2px;
     cursor: pointer;
     outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.tracker-region-select:hover {
+    border-color: rgba(255, 120, 0, 0.3);
+}
+
+.tracker-region-select:focus {
+    border-color: rgba(255, 120, 0, 0.6);
+    box-shadow: 0 0 12px rgba(255, 100, 0, 0.15);
+}
+
+.tracker-region-select option {
+    background-color: #0c0c0c;
+    color: #fff;
+}
+
+.tracker-region-select option:hover,
+.tracker-region-select option:focus,
+.tracker-region-select option:checked {
+    background-color: #ff6a00;
+    color: #fff;
 }
 
 .tracker-search-btn {
