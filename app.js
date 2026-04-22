@@ -41,7 +41,7 @@ let currentUser = null;
   const introOverlay = document.getElementById('intro-overlay');
   const mainNav = document.getElementById('main-nav');
   const navLinks = document.getElementById('nav-links');
-  const hamburgerBtn = document.getElementById('hamburger-btn');
+  const mobileBtn = document.getElementById('mobile-menu-btn');
   const emberContainer = document.getElementById('ember-container');
   // ===== INTRO ANIMATION =====
   function playIntro() {
@@ -92,8 +92,10 @@ let currentUser = null;
       });
 
       // Close mobile menu
-      if (navLinks) navLinks.classList.remove('open');
-      if (hamburgerBtn) hamburgerBtn.classList.remove('open');
+      const sidebar = document.getElementById('sidebar');
+      const sidebarOverlay = document.getElementById('sidebar-overlay');
+      if (sidebar) sidebar.classList.remove('open');
+      if (sidebarOverlay) sidebarOverlay.classList.remove('open');
     }
 
     // Logo click -> home
@@ -168,70 +170,52 @@ let currentUser = null;
   const NAV_EMBER_COUNT = 20;
   const navEmberContainer = document.getElementById('nav-ember-container');
 
-  function createNavEmbers() {
-    if (!navEmberContainer) return;
-    // Clear existing
-    navEmberContainer.innerHTML = '';
-
-    for (let i = 0; i < NAV_EMBER_COUNT; i++) {
-      const ember = document.createElement('div');
-      ember.classList.add('ember');
-
-      const size = 2 + Math.random() * 5;
-      const left = Math.random() * 100;
-      const duration = 5 + Math.random() * 8;
-      const delay = Math.random() * 4;
-
-      ember.style.width = `${size}px`;
-      ember.style.height = `${size}px`;
-      ember.style.left = `${left}%`;
-      ember.style.bottom = `-${size}px`;
-      ember.style.animationDuration = `${duration}s`;
-      ember.style.animationDelay = `${delay}s`;
-
-      navEmberContainer.appendChild(ember);
-    }
-  }
-
-  function clearNavEmbers() {
-    if (navEmberContainer) navEmberContainer.innerHTML = '';
-  }
-
   function initMobileMenu() {
-    if (!hamburgerBtn || !navLinks) return;
+    const sidebar = document.getElementById('sidebar');
+    const sidebarTrigger = document.getElementById('sidebar-trigger');
+    const closeSidebarBtn = document.getElementById('close-sidebar');
+    const sidebarOverlay = document.getElementById('sidebar-overlay');
 
-    hamburgerBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const isOpening = !hamburgerBtn.classList.contains('open');
-      hamburgerBtn.classList.toggle('open');
-      navLinks.classList.toggle('open');
+    function openSidebar() { 
+        if (window.innerWidth > 1024) return; 
+        if (sidebar) sidebar.classList.add('open'); 
+        if (sidebarOverlay) sidebarOverlay.classList.add('open');
+    }
+    
+    function closeSidebar() { 
+        if (sidebar) sidebar.classList.remove('open'); 
+        if (sidebarOverlay) sidebarOverlay.classList.remove('open');
+    }
 
-      if (isOpening) {
-        createNavEmbers();
-      } else {
-        clearNavEmbers();
-      }
-    });
+    if (sidebarTrigger) sidebarTrigger.addEventListener('mouseenter', openSidebar);
+    if (sidebar) sidebar.addEventListener('mouseleave', closeSidebar);
+    if (closeSidebarBtn) closeSidebarBtn.addEventListener('click', closeSidebar);
+    if (mobileBtn) mobileBtn.addEventListener('click', openSidebar);
+    if (sidebarOverlay) sidebarOverlay.addEventListener('click', closeSidebar);
 
-    // Close menu when clicking a link inside mobile menu
-    navLinks.querySelectorAll('.nav-link').forEach((link) => {
-      link.addEventListener('click', () => {
-        hamburgerBtn.classList.remove('open');
-        navLinks.classList.remove('open');
-        clearNavEmbers();
-      });
-    });
+    let touchStartX = 0, touchEndX = 0, touchStartY = 0, touchEndY = 0;
+    document.addEventListener('touchstart', e => {
+        touchStartX = e.changedTouches[0].screenX;
+        touchStartY = e.changedTouches[0].screenY;
+    }, {passive: true});
 
-    // Close menu when tapping outside
-    document.addEventListener('click', (e) => {
-      if (navLinks.classList.contains('open') &&
-        !navLinks.contains(e.target) &&
-        !hamburgerBtn.contains(e.target)) {
-        hamburgerBtn.classList.remove('open');
-        navLinks.classList.remove('open');
-        clearNavEmbers();
-      }
-    });
+    document.addEventListener('touchend', e => {
+        touchEndX = e.changedTouches[0].screenX;
+        touchEndY = e.changedTouches[0].screenY;
+        const xDiff = touchEndX - touchStartX;
+        const yDiff = Math.abs(touchEndY - touchStartY);
+        if (Math.abs(xDiff) > yDiff && Math.abs(xDiff) > 40) {
+            if (xDiff > 0 && touchStartX < 50) openSidebar();
+            else if (xDiff < 0 && sidebar && sidebar.classList.contains('open')) closeSidebar();
+        }
+    }, {passive: true});
+    
+    // Close sidebar on link click
+    if (sidebar) {
+        sidebar.querySelectorAll('.nav-link').forEach((link) => {
+            link.addEventListener('click', closeSidebar);
+        });
+    }
   }
 
   // ===== SCROLL REVEAL =====
@@ -720,6 +704,10 @@ let currentUser = null;
     history = history.filter(h => !(h.name.toLowerCase() === name.toLowerCase() && h.tag.toLowerCase() === tag.toLowerCase()));
     localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
     renderHistory();
+    // Cloud sync
+    if (currentUser) {
+      setDoc(doc(db, 'users', currentUser.uid), { trackerHistory: history }, { merge: true }).catch(() => { });
+    }
   }
 
   function clearHistory() {
