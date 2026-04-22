@@ -1994,6 +1994,44 @@ button {
     font-size: 12px;
     letter-spacing: 3px;
     white-space: nowrap;
+    
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text-primary);
+    position: relative;
+    z-index: 1;
+}
+
+.tracker-search-btn::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 2px; /* Border thickness */
+    background: var(--accent-gradient);
+    background-size: 200% auto;
+    -webkit-mask: 
+       linear-gradient(#fff 0 0) content-box, 
+       linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.tracker-search-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(255, 100, 0, 0.15);
+}
+
+.tracker-search-btn:hover::before {
+    animation: trackerGradientShift 2s linear infinite;
+}
+
+@keyframes trackerGradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
 }
 
 /* Error & Loading */
