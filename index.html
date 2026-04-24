@@ -22,6 +22,10 @@
     <!-- ===== SVG ICON SPRITE SHEET ===== -->
     <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
         <defs>
+            <symbol id="icon-menu" viewBox="0 0 24 24">
+                <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M4 6h16M4 12h16M4 18h16" />
+            </symbol>
             <symbol id="icon-youtube" viewBox="0 0 24 24">
                 <path fill="currentColor"
                     d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
@@ -46,29 +50,85 @@
                 <path fill="currentColor" d="M12 2L2 19h4l6-10.5L18 19h4L12 2z" />
                 <rect fill="currentColor" x="9" y="19" width="6" height="3" rx="1" />
             </symbol>
+            <symbol id="icon-google" viewBox="0 0 24 24">
+                <path fill="currentColor"
+                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                <path fill="currentColor"
+                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                <path fill="currentColor"
+                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                <path fill="currentColor"
+                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+            </symbol>
+            <symbol id="icon-logout" viewBox="0 0 24 24">
+                <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4m7 14l5-5l-5-5m5 5H9" />
+            </symbol>
         </defs>
     </svg>
 
     <!-- ===== INTRO OVERLAY ===== -->
     <div id="intro-overlay"></div>
 
+    <!-- ===== SIDEBAR MENU ===== -->
+    <div id="sidebar-trigger"></div>
+    <div id="sidebar-overlay"></div>
+    <aside id="sidebar">
+        <button id="close-sidebar">&times;</button>
+        <div class="sidebar-creative-bg"></div>
+        <div class="sidebar-links">
+            <a href="#home" class="nav-link active" data-page="home"><span>Home</span></a>
+            <a href="#rosters" class="nav-link" data-page="rosters"><span>Rosters</span></a>
+            <a href="#creators" class="nav-link" data-page="creators"><span>Creators</span></a>
+            <a href="#tracker" class="nav-link" data-page="tracker"
+                style="display:flex;align-items:center;justify-content:center;gap:4px;"><span>Tracker</span><span
+                    class="nav-beta-badge"><span class="nav-beta-dot"></span>BETA</span></a>
+            <a href="#shop" class="nav-link" data-page="shop"><span>Shop</span></a>
+            <a href="#about" class="nav-link" data-page="about"><span>About</span></a>
+            <a href="https://discord.gg/9yPMDEsARR" target="_blank" rel="noopener" class="nav-link sidebar-discord-btn">
+                <svg class="social-icon"
+                    style="width:16px;height:16px;margin-right:8px;vertical-align:middle;flex-shrink:0;">
+                    <use href="#icon-discord" />
+                </svg>
+                <span>Join Discord</span>
+            </a>
+        </div>
+    </aside>
+
     <!-- ===== NAVIGATION ===== -->
     <nav id="main-nav" class="nav-hidden">
+        <button id="mobile-menu-btn">
+            <svg viewBox="0 0 24 24">
+                <use href="#icon-menu" />
+            </svg>
+        </button>
         <a href="#home" class="nav-logo" id="nav-logo-link">
             <img src="assets/images/phoenix-logo.png" alt="Team Phoenix" class="nav-logo-img">
-            <span class="nav-brand-name">TEAM PHOENIX</span>
+            <span class="nav-brand-name">Team Phoenix</span>
         </a>
-        <div class="nav-links" id="nav-links">
+        <div class="nav-links-desktop" id="nav-links">
             <div class="nav-ember-container" id="nav-ember-container"></div>
-            <a href="#home" class="nav-link active" data-page="home">HOME</a>
-            <a href="#shop" class="nav-link" data-page="shop">SHOP</a>
-            <a href="#rosters" class="nav-link" data-page="rosters">ROSTERS</a>
-            <a href="#tracker" class="nav-link nav-link-badge" data-page="tracker">TRACKER<span class="nav-beta-badge">BETA</span></a>
-            <a href="#about" class="nav-link" data-page="about">ABOUT</a>
+            <a href="#rosters" class="nav-link-dt" data-page="rosters">Rosters</a>
+            <a href="#shop" class="nav-link-dt" data-page="shop">Shop</a>
+            <a href="#creators" class="nav-link-dt" data-page="creators">Creators</a>
+            <a href="#tracker" class="nav-link-dt" data-page="tracker"
+                style="display:inline-flex;align-items:center;gap:4px;">Tracker <span class="nav-beta-badge"><span
+                        class="nav-beta-dot"></span>BETA</span></a>
+            <a href="#about" class="nav-link-dt" data-page="about">About</a>
         </div>
-        <button class="nav-hamburger" id="hamburger-btn" aria-label="Toggle menu">
-            <span></span><span></span><span></span>
-        </button>
+        <div class="nav-right">
+            <button id="auth-btn" class="nav-join-btn" style="cursor: pointer;">
+                <span id="auth-text">Login</span>
+            </button>
+            <a href="https://discord.gg/9yPMDEsARR" target="_blank" rel="noopener" class="nav-join-btn dt-only"
+                id="nav-join-btn">
+                <svg class="nav-join-icon" viewBox="0 0 24 24">
+                    <path fill="currentColor"
+                        d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z" />
+                </svg>
+                Join Us
+            </a>
+        </div>
     </nav>
 
     <!-- ===== PAGE: HOME ===== -->
@@ -77,9 +137,7 @@
             <div class="ember-container" id="ember-container"></div>
             <div class="hero-center">
                 <div class="hero-logo-wrapper" id="hero-logo-wrapper">
-                    <div id="wing-left" class="wing-container wing-left"></div>
                     <img src="assets/images/phoenix-logo.png" alt="Team Phoenix" class="hero-logo" id="hero-logo">
-                    <div id="wing-right" class="wing-container wing-right"></div>
                     <div class="logo-glow" id="logo-glow"></div>
                 </div>
                 <h1 class="hero-title">TEAM <span class="hero-title-accent">PHOENIX</span></h1>
@@ -87,12 +145,6 @@
                 <div class="hero-cta-row">
                     <a href="#about" class="btn-primary" data-nav="about">ABOUT US</a>
                     <a href="#rosters" class="btn-outline" data-nav="rosters">VIEW ROSTER</a>
-                    <a href="https://discord.gg/9yPMDEsARR" target="_blank" rel="noopener" class="btn-discord">
-                        <svg class="btn-icon">
-                            <use href="#icon-discord" />
-                        </svg>
-                        JOIN COMMUNITY
-                    </a>
                 </div>
             </div>
         </div>
@@ -152,6 +204,82 @@
             <p class="coming-soon-subtitle">Our official merchandise is on its way.<br>Stay tuned for exclusive Team
                 Phoenix gear.</p>
             <div class="coming-soon-line"></div>
+        </div>
+    </section>
+
+    <!-- ===== PAGE: CREATORS ===== -->
+    <section id="creators" class="page">
+        <div class="creators-container">
+            <div class="creators-header">
+                <span class="creators-badge">CONTENT CREATORS</span>
+                <h2 class="creators-title">OUR <span class="accent">CREATORS</span></h2>
+                <div class="creators-divider"></div>
+            </div>
+
+            <div class="creators-grid">
+                <!-- Creator: ozen -->
+                <div class="creator-card-featured" id="creator-ozen">
+                    <div class="creator-card-bg"></div>
+                    <div class="creator-card-glow"></div>
+
+                    <!-- Profile Header -->
+                    <div class="creator-profile">
+                        <img src="assets/images/ozen-logo.jpg" alt="ozen" class="creator-avatar">
+                        <div class="creator-info">
+                            <h3 class="creator-name">ozen</h3>
+                            <span class="creator-role">CONTENT CREATOR · ORGANIZATION MANAGER</span>
+                            <div class="creator-social-row">
+                                <a href="https://youtube.com/@ozen_gg" target="_blank" rel="noopener"
+                                    class="creator-social-link" title="YouTube">
+                                    <svg class="social-icon">
+                                        <use href="#icon-youtube" />
+                                    </svg>
+                                </a>
+                                <a href="https://x.com/ozen_gg" target="_blank" rel="noopener"
+                                    class="creator-social-link" title="X / Twitter">
+                                    <svg class="social-icon">
+                                        <use href="#icon-twitter" />
+                                    </svg>
+                                </a>
+                                <a href="https://www.instagram.com/ozen_gg" target="_blank" rel="noopener"
+                                    class="creator-social-link" title="Instagram">
+                                    <svg class="social-icon">
+                                        <use href="#icon-instagram" />
+                                    </svg>
+                                </a>
+                                <a href="https://discord.com" target="_blank" rel="noopener" class="creator-social-link"
+                                    title="Discord: @0zen_gg">
+                                    <svg class="social-icon">
+                                        <use href="#icon-discord" />
+                                    </svg>
+                                </a>
+                                <a href="https://twitch.tv/0zen_gg" target="_blank" rel="noopener"
+                                    class="creator-social-link" title="Twitch">
+                                    <svg class="social-icon">
+                                        <use href="#icon-twitch" />
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Latest Content Section -->
+                    <div class="creator-content-section">
+                        <div class="creator-content-label">LATEST VIDEOS</div>
+                        <div class="creator-videos" id="creator-ozen-videos">
+                            <!-- Populated by JS from YouTube RSS -->
+                        </div>
+                        <a href="https://youtube.com/@ozen_gg" target="_blank" rel="noopener" class="creator-view-all">
+                            <svg class="social-icon" style="width:14px;height:14px">
+                                <use href="#icon-youtube" />
+                            </svg>
+                            View All on YouTube
+                        </a>
+                    </div>
+
+                    <div class="creator-card-border"></div>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -252,9 +380,12 @@
                     <div class="roster-social-overlay">
                         <div class="roster-social-label">SOCIALS</div>
                         <div class="roster-social-icons">
-                            <!--<a href="https://x.com/" target="_blank" rel="noopener" class="roster-social-link" title="X / Twitter">
-                                <svg class="social-icon"><use href="#icon-twitter" /></svg>
-                            </a> -->
+                            <a href="https://x.com/BabyMeoW_vlr" target="_blank" rel="noopener"
+                                class="roster-social-link" title="X / Twitter">
+                                <svg class="social-icon">
+                                    <use href="#icon-twitter" />
+                                </svg>
+                            </a>
                             <a href="https://instagram.com/rajnishmaurya_vlr" target="_blank" rel="noopener"
                                 class="roster-social-link" title="Instagram">
                                 <svg class="social-icon">
@@ -274,7 +405,7 @@
                         <div class="player-initial">R</div>
                     </div>
                     <div class="roster-card-info">
-                        <h3 class="player-name">BITTEN BY HER</h3>
+                        <h3 class="player-name">REHANN</h3>
                         <span class="player-role">SEC DUELIST/FLEX</span>
                     </div>
                     <div class="roster-social-overlay">
@@ -413,8 +544,10 @@
                     <div class="tracker-panel-label tracker-history-header">
                         RECENT SEARCHES
                         <button class="tracker-history-clear" id="tracker-history-clear" title="Clear all history">
-                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-                                <path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m2 0v14a2 2 0 01-2 2H8a2 2 0 01-2-2V6h12z"/>
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
+                                stroke-width="1.5" stroke-linecap="round">
+                                <path
+                                    d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m2 0v14a2 2 0 01-2 2H8a2 2 0 01-2-2V6h12z" />
                             </svg>
                         </button>
                     </div>
@@ -422,9 +555,10 @@
                         <!-- Populated by JS -->
                     </div>
                     <div class="tracker-history-empty" id="tracker-history-empty">
-                        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round">
-                            <circle cx="11" cy="11" r="8"/>
-                            <path d="m21 21-4.3-4.3"/>
+                        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor"
+                            stroke-width="1" stroke-linecap="round">
+                            <circle cx="11" cy="11" r="8" />
+                            <path d="m21 21-4.3-4.3" />
                         </svg>
                         <span>No recent searches yet</span>
                     </div>
@@ -651,6 +785,54 @@
         </div>
     </section>
 
+    <!-- ===== PAGE: SETTINGS ===== -->
+    <section id="settings" class="page">
+        <div class="settings-container">
+            <div class="settings-header">
+                <span class="roster-badge">ACCOUNT</span>
+                <h2 class="roster-game-title" style="font-size:36px;">SETTINGS</h2>
+                <div class="roster-divider"></div>
+            </div>
+            <div class="settings-card">
+                <div class="settings-profile-row">
+                    <img id="settings-avatar" src="" alt="Avatar" class="settings-avatar-img">
+                    <div>
+                        <h3 id="settings-name" class="settings-display-name"></h3>
+                        <p id="settings-email" class="settings-email-text"></p>
+                    </div>
+                </div>
+                <div class="settings-field">
+                    <label class="settings-label">Profile Picture</label>
+                    <div class="settings-file-row">
+                        <div class="settings-preview-wrap">
+                            <img id="settings-preview-img" src="" class="settings-preview-img">
+                        </div>
+                        <div style="flex: 1;">
+                            <input type="file" id="settings-file-input" accept="image/*" style="display: none;">
+                            <label for="settings-file-input" class="btn-outline"
+                                style="display:inline-block;padding:8px 16px;font-size:11px;cursor:pointer;letter-spacing:2px;">CHOOSE
+                                IMAGE</label>
+                            <span id="settings-file-name" class="settings-file-name">No file chosen</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="settings-field">
+                    <label class="settings-label">Profile Name</label>
+                    <input type="text" id="settings-display-name" class="tracker-search-input" placeholder="Your Name"
+                        style="padding-left:16px;">
+                </div>
+                <div class="settings-field">
+                    <label class="settings-label">Linked Riot ID</label>
+                    <input type="text" id="settings-riot-id" class="tracker-search-input" placeholder="e.g. 0zen#cool"
+                        style="padding-left:16px;">
+                </div>
+                <button id="settings-save-btn" class="btn-primary" style="width:100%;margin-top:10px;">SAVE
+                    CHANGES</button>
+                <p id="settings-msg" class="settings-msg"></p>
+            </div>
+        </div>
+    </section>
+
     <!-- ===== FOOTER ===== -->
     <footer id="site-footer">
         <div class="footer-content">
@@ -659,7 +841,57 @@
         </div>
     </footer>
 
-    <script src="app.js"></script>
+    <!-- ===== PROFILE SIDEBAR ===== -->
+    <aside id="profile-sidebar">
+        <button id="close-profile-btn" class="profile-close">&times;</button>
+        <div class="profile-header">
+            <img id="ps-avatar" src="" alt="Profile Image" class="profile-avatar">
+            <h3 id="ps-name" class="profile-name">Username</h3>
+            <p id="ps-email" class="profile-email">user@email.com</p>
+        </div>
+        <div class="profile-body">
+            <div class="profile-link-card" id="link-account-settings" data-page="settings">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="20" stroke-width="1.5">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                </svg>
+                Account Settings
+            </div>
+        </div>
+        <button id="ps-logout-btn" class="btn-outline profile-logout-btn">
+            <svg style="width:16px; height:16px; margin-right:8px;">
+                <use href="#icon-logout" />
+            </svg> Sign Out
+        </button>
+    </aside>
+
+    <!-- ===== LOGIN MODAL ===== -->
+    <div id="login-modal" class="login-modal-overlay">
+        <div class="login-modal-content">
+            <button id="close-modal-btn" class="profile-close"
+                style="position:absolute;top:15px;right:15px;">&times;</button>
+            <h2 class="login-modal-title">Welcome Back</h2>
+            <div class="login-form">
+                <input type="email" id="email-input" class="tracker-search-input" placeholder="Email Address"
+                    style="padding-left:16px;margin-bottom:10px;">
+                <input type="password" id="password-input" class="tracker-search-input" placeholder="Password"
+                    style="padding-left:16px;margin-bottom:15px;">
+                <button id="email-login-btn" class="btn-primary" style="width:100%;margin-bottom:10px;">LOGIN WITH
+                    EMAIL</button>
+                <button id="email-signup-btn" class="btn-outline" style="width:100%;margin-bottom:20px;">CREATE
+                    ACCOUNT</button>
+            </div>
+            <div class="login-divider-row">
+                <hr class="login-divider-line"><span class="login-divider-text">OR</span>
+                <hr class="login-divider-line">
+            </div>
+            <div id="google-btn-wrapper" style="width:100%; display:flex; justify-content:center;"></div>
+            <p id="login-error-msg" class="login-error-msg"></p>
+        </div>
+    </div>
+
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script type="module" src="app.js"></script>
 </body>
 
 </html>
