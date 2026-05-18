@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>403 — Forbidden | Team Phoenix</title>
+    <meta name="description" content="Access forbidden. You don't have permission to view this page.">
+    <meta name="theme-color" content="#000000">
+    <link rel="icon" type="image/png" href="assets/images/phoenix-logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #000000;
+            --bg-card: rgba(12, 12, 12, 0.45);
+            --bg-glass: rgba(255, 255, 255, 0.03);
+            --border-subtle: rgba(255, 255, 255, 0.06);
+            --border-medium: rgba(255, 255, 255, 0.12);
+            --text-primary: #ffffff;
+            --text-secondary: #999999;
+            --text-muted: #555555;
+            --accent-red: #ff4625;
+            --accent-orange: #ff6a00;
+            --accent-yellow: #ffaa00;
+            --accent-gradient: linear-gradient(135deg, #ff4625, #ff6a00, #ffaa00);
+            --font-primary: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+            --radius-btn: 50px;
+            --radius-md: 12px;
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        html { -webkit-font-smoothing: antialiased; }
+
+        body {
+            font-family: var(--font-primary);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(255, 40, 40, 0.06) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .error-container {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 40px 24px;
+            max-width: 520px;
+            width: 100%;
+            animation: fadeIn 0.8s var(--ease-out-expo) forwards;
+        }
+
+        .error-icon {
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(255, 70, 37, 0.06);
+            border: 1px solid rgba(255, 70, 37, 0.15);
+            border-radius: var(--radius-md);
+            margin-bottom: 32px;
+            animation: iconPulse 3s ease-in-out infinite;
+        }
+
+        .error-icon svg {
+            width: 36px;
+            height: 36px;
+            color: var(--accent-red);
+            opacity: 0.9;
+        }
+
+        .error-code {
+            font-size: clamp(72px, 15vw, 120px);
+            font-weight: 900;
+            letter-spacing: 8px;
+            line-height: 1;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+            animation: glitchShift 6s ease-in-out infinite;
+        }
+
+        .error-label {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 6px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 28px;
+        }
+
+        .error-divider {
+            width: 60px;
+            height: 2px;
+            background: var(--accent-gradient);
+            margin-bottom: 28px;
+            border-radius: 1px;
+        }
+
+        .error-message {
+            font-size: 15px;
+            line-height: 1.8;
+            color: var(--text-secondary);
+            max-width: 400px;
+            margin-bottom: 36px;
+        }
+
+        .error-actions {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            padding: 12px 28px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            background: var(--accent-gradient);
+            color: #000;
+            border: none;
+            border-radius: var(--radius-btn);
+            cursor: pointer;
+            transition: filter 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--font-primary);
+        }
+        .btn-primary:hover { filter: brightness(1.2); }
+
+        .btn-outline {
+            padding: 12px 28px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            background: transparent;
+            color: var(--text-primary);
+            border: 1px solid var(--border-medium);
+            border-radius: var(--radius-btn);
+            cursor: pointer;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--font-primary);
+        }
+        .btn-outline:hover { border-color: var(--accent-red); background-color: rgba(255, 70, 37, 0.15); }
+
+        .error-footer {
+            position: absolute;
+            bottom: 30px;
+            left: 0;
+            right: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .footer-logo {
+            width: 18px;
+            height: 18px;
+            object-fit: contain;
+            opacity: 0.5;
+        }
+
+        .footer-text {
+            font-size: 11px;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+        }
+
+        .ember-container {
+            position: fixed;
+            inset: 0;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .ember {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--accent-orange), transparent);
+            opacity: 0;
+            animation: emberFloat linear infinite;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes iconPulse {
+            0%, 100% { border-color: rgba(255, 70, 37, 0.15); background-color: rgba(255, 70, 37, 0.06); }
+            50% { border-color: rgba(255, 70, 37, 0.3); background-color: rgba(255, 70, 37, 0.1); }
+        }
+
+        @keyframes glitchShift {
+            0%, 100% { letter-spacing: 8px; }
+            50% { letter-spacing: 12px; }
+        }
+
+        @keyframes emberFloat {
+            0% { transform: translateY(0) scale(1); opacity: 0; }
+            5% { opacity: 0.8; }
+            80% { opacity: 0.4; }
+            100% { transform: translateY(-100vh) scale(0.3); opacity: 0; }
+        }
+
+        ::-webkit-scrollbar { display: none; }
+        * { scrollbar-width: none; -ms-overflow-style: none; }
+
+        @media (max-width: 480px) {
+            .error-code { letter-spacing: 4px; }
+            .error-label { letter-spacing: 4px; font-size: 10px; }
+            .error-actions { flex-direction: column; width: 100%; padding: 0 20px; }
+            .btn-primary, .btn-outline { width: 100%; justify-content: center; }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="ember-container" id="ember-container"></div>
+
+    <div class="error-container">
+        <div class="error-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
+            </svg>
+        </div>
+
+        <h1 class="error-code">403</h1>
+        <p class="error-label">Forbidden</p>
+        <div class="error-divider"></div>
+        <p class="error-message">
+            You don't have permission to access this resource.<br>
+            If you believe this is a mistake, contact the team.
+        </p>
+
+        <div class="error-actions">
+            <a href="/" class="btn-primary">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                    <polyline points="9 22 9 12 15 12 15 22" />
+                </svg>
+                GO HOME
+            </a>
+            <a href="https://discord.gg/9yPMDEsARR" target="_blank" rel="noopener" class="btn-outline">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+                    <path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189z" />
+                </svg>
+                CONTACT US
+            </a>
+        </div>
+    </div>
+
+    <div class="error-footer">
+        <img src="assets/images/phoenix-logo.png" alt="Phoenix" class="footer-logo">
+        <span class="footer-text">&copy; 2026 Team Phoenix</span>
+    </div>
+
+    <script>
+        (function () {
+            const container = document.getElementById('ember-container');
+            for (let i = 0; i < 20; i++) {
+                const ember = document.createElement('div');
+                ember.classList.add('ember');
+                const size = 2 + Math.random() * 4;
+                ember.style.width = `${size}px`;
+                ember.style.height = `${size}px`;
+                ember.style.left = `${Math.random() * 100}%`;
+                ember.style.bottom = `-${size}px`;
+                ember.style.animationDuration = `${6 + Math.random() * 10}s`;
+                ember.style.animationDelay = `${Math.random() * 12}s`;
+                container.appendChild(ember);
+            }
+        })();
+    </script>
+</body>
+
+</html>
