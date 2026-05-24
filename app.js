@@ -24,7 +24,7 @@ async function apiCall(method, path, body, isFormData) {
 
 let currentUser = null;
 
-const YT_API_KEY = 'AIzaSyAeiq_e8lNlG4LJarTg1i8BHuv_wTEvlz8';
+const YT_API_KEY = 'YOUR_GOOGLE_API_KEY';
 const CREATOR_CHANNELS = [
   { channelId: 'UC6rMH3tbkLW5b8kBA-k6vWg', handle: 'ozen_gg', containerId: 'creator-ozen-videos' }
 ];
