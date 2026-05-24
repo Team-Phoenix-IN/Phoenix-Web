@@ -1,0 +1,392 @@
+/* ─── ProfileCard (React Bits port) ─── */
+:root {
+  --pc-width: 300px;
+  --pc-height: 320px;
+}
+
+@media (max-width: 768px) {
+  :root {
+    --pc-width: 260px;
+    --pc-height: 280px;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --pc-width: clamp(220px, 75vw, 300px);
+    --pc-height: 300px;
+  }
+  .pc-card-wrapper {
+    width: var(--pc-width);
+    height: var(--pc-height);
+  }
+}
+
+.pc-card-wrapper {
+  position: relative;
+  width: var(--pc-width);
+  height: var(--pc-height);
+  perspective: 1000px;
+  background: transparent;
+  flex-shrink: 0;
+}
+
+/* Behind glow */
+.pc-behind {
+  position: absolute;
+  top: 10%; left: 10%;
+  width: 80%; height: 80%;
+  border-radius: 40px;
+  background: var(--behind-glow-color, rgba(125,190,255,0.67));
+  filter: blur(70px);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.6s ease 0.6s, transform 0.5s cubic-bezier(0.16,1,0.3,1);
+  transform: translate3d(0,0,-40px) scale(0.9);
+  z-index: 0;
+}
+.pc-card-wrapper:hover .pc-behind {
+  opacity: 0.42;
+  transform: translate3d(0,0,-30px) scale(1.08);
+}
+
+/* Card shell — handles 3D tilt transform */
+.pc-card-shell {
+  position: absolute;
+  inset: 0;
+  border-radius: 24px;
+  transform-style: preserve-3d;
+  will-change: transform;
+  z-index: 1;
+}
+.pc-card-shell:not(.active) { transition: transform 0.5s ease; }
+.pc-card-shell.active {
+  transform: rotateX(var(--rotate-x, 0deg)) rotateY(var(--rotate-y, 0deg));
+}
+
+/* Card outer */
+.pc-card {
+  width: 100%; height: 100%;
+  padding: 1px;
+  box-sizing: border-box;
+  background: linear-gradient(135deg,rgba(255,255,255,0.1),rgba(255,255,255,0.03) 70%,rgba(255,255,255,0)) no-repeat border-box;
+  border-radius: inherit;
+  overflow: hidden;
+  box-shadow: 0 45px 100px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.08);
+}
+
+/* Card inner */
+.pc-inside {
+  position: relative;
+  width: 100%; height: 100%;
+  background: rgba(15, 13, 19, 0.35); /* semi-transparent to show pixels */
+  border-radius: inherit;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+/* Grain texture overlay */
+.pc-inside::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.035;
+  background: var(--grain);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Glare — follows cursor */
+.pc-glare {
+  position: absolute; inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at var(--pointer-x,50%) var(--pointer-y,50%), rgba(255,255,255,0.12), transparent 45%);
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+/* Shine border — follows cursor */
+.pc-shine {
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: radial-gradient(circle at var(--pointer-x,50%) var(--pointer-y,50%), rgba(255,255,255,0.33), transparent 35%);
+  -webkit-mask: linear-gradient(#fff,#fff) content-box, linear-gradient(#fff,#fff);
+  mask: linear-gradient(#fff,#fff) content-box, linear-gradient(#fff,#fff);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  z-index: 4;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.pc-card-shell.active .pc-glare,
+.pc-card-shell.active .pc-shine { opacity: 1; }
+
+/* Content sections */
+.pc-content {
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 20px 18px;
+}
+
+/* Top avatar section — gradient + icon pattern */
+.pc-avatar-content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  padding-bottom: 16px;
+  position: relative;
+}
+
+.pc-avatar-content::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: var(--inner-gradient);
+  background-position: var(--background-x,50%) var(--background-y,50%);
+  background-size: 140% 140%;
+  opacity: 0;
+  transition: opacity 0.6s ease 0.6s, background-position 0.25s ease-out;
+  z-index: 0;
+}
+
+.pc-card-wrapper:hover .pc-avatar-content::before {
+  opacity: 1;
+}
+
+/* Icon pattern overlay */
+.pc-avatar-content::after {
+  content: '';
+  position: absolute; inset: 0;
+  opacity: 0.09;
+  background-image: var(--icon);
+  background-repeat: repeat;
+  background-size: 72px;
+  mix-blend-mode: overlay;
+  z-index: 0;
+  mask-image: radial-gradient(circle, rgba(0,0,0,1) 30%, rgba(0,0,0,0.1) 85%);
+  -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 30%, rgba(0,0,0,0.1) 85%);
+}
+
+.pc-avatar-content > * { z-index: 1; position: relative; }
+
+/* Avatar circle container */
+.pc-avatar-circle {
+  width: 88px; height: 88px;
+  border-radius: 50%;
+  border: 3px solid rgba(255,255,255,0.14);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.4);
+  overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.06);
+  margin-top: 10px;
+  transition: transform 0.3s ease, border-color 0.3s ease;
+}
+.pc-card-shell.active .pc-avatar-circle {
+  transform: scale(1.05) translateZ(10px);
+  border-color: rgba(255,255,255,0.28);
+}
+
+.pc-avatar-circle .avatar {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Initial letter when no avatar */
+.pc-avatar-initial {
+  font-size: 36px;
+  font-weight: 900;
+  color: rgba(255,255,255,0.85);
+  line-height: 1;
+  text-shadow: 0 0 20px rgba(255,255,255,0.3);
+}
+
+/* Bottom user info row */
+.pc-user-info {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 14px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
+}
+
+.pc-card-wrapper:hover .pc-user-info {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  transition-delay: 1.0s;
+}
+
+.pc-user-details { display: flex; align-items: center; gap: 8px; }
+
+.pc-mini-avatar {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 1.5px solid rgba(255,255,255,0.2);
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.08);
+}
+.pc-mini-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.pc-mini-initial { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.7); }
+
+.pc-user-text { display: flex; flex-direction: column; line-height: 1.2; }
+.pc-handle { color: #fff; font-size: 0.72rem; font-weight: 600; }
+.pc-status { color: rgba(255,255,255,0.45); font-size: 0.62rem; }
+
+.pc-contact-btn {
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.14);
+  padding: 5px 11px;
+  border-radius: 20px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s, border-color 0.2s, transform 0.2s;
+}
+.pc-contact-btn:hover {
+  background: rgba(255,255,255,0.18);
+  border-color: rgba(255,255,255,0.28);
+  transform: translateY(-1px);
+}
+
+/* Social icon row */
+.pc-socials {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.pc-social-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.55);
+  text-decoration: none;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+}
+
+.pc-social-icon-btn:hover {
+  background: rgba(255,255,255,0.18);
+  border-color: rgba(255,255,255,0.3);
+  color: #fff;
+  transform: translateY(-2px) scale(1.08);
+}
+
+.pc-social-icon-btn svg {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
+
+
+/* Bottom name + role */
+.pc-details { 
+  display: flex; flex-direction: column; gap: 3px; 
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
+}
+.pc-details h3 {
+  margin: 0;
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  font-family: inherit;
+}
+.pc-details p {
+  margin: 0;
+  color: rgba(255,255,255,0.5);
+  font-size: 0.78rem;
+  font-weight: 400;
+  letter-spacing: 0.3px;
+  font-family: inherit;
+}
+
+/* Discord Status & Activity */
+.roster-discord-status {
+  position: absolute;
+  bottom: 12px;
+  right: 0px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 3px solid #161219;
+  z-index: 10;
+}
+
+.status-online { background-color: #23a559; }
+.status-idle { background-color: #f0b232; }
+.status-dnd { background-color: #f23f43; }
+.status-offline { background-color: #80848e; display: none; /* Usually offline isn't shown, but keeping for structure */ }
+
+.discord-status-dnd-icon {
+  width: 50%;
+  height: 15%;
+  background: white;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 1px;
+}
+
+.discord-status-idle-icon {
+  width: 50%;
+  height: 50%;
+  background: #161219;
+  border-radius: 50%;
+  position: absolute;
+  top: 0;
+  left: -2px;
+}
+
+.roster-activity-tooltip {
+  position: absolute;
+  top: 135px;
+  left: 50%;
+  transform: translate(-50%, 0);
+  background: rgba(0, 0, 0, 0.88);
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 99;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  border: 1px solid rgba(255,255,255,0.15);
+}
+
+.pc-card-wrapper:hover .roster-activity-tooltip {
+  opacity: 1;
+  transform: translate(-50%, 4px);
+}
