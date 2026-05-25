@@ -12,7 +12,7 @@ function AvatarFallback({ name }) {
 export default function Navbar() {
     const location = useLocation();
     const navigate = useNavigate();
-    const { currentUser, openLoginModal, openProfileSidebar } = useAuth();
+    const { currentUser, openProfileSidebar } = useAuth();
     const [navHidden, setNavHidden] = useState(false);
     const navRef = useRef(null);
 
@@ -77,7 +77,7 @@ export default function Navbar() {
 
     const handleAuthClick = () => {
         if (currentUser) openProfileSidebar();
-        else openLoginModal();
+        else navigate('/login');
     };
 
     const isActive = (path) => {

@@ -1,7 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import EmberParticles from '../components/EmberParticles';
-import Aurora from '../components/Aurora';
-import BorderGlow from '../components/BorderGlow';
+import PhoenixHero from '../components/PhoenixHero/PhoenixHero';
 import DiscordWidget from '../components/DiscordWidget';
 
 export default function HomePage() {
@@ -14,56 +12,7 @@ export default function HomePage() {
 
     return (
         <section id="home" className="page active">
-            <div className="hero">
-                <Aurora
-                    colorStops={["#f01d1d","#FFa54d","#f01d1d"]}
-                    blend={0.64}
-                    amplitude={1.0}
-                    speed={0.6}
-                />
-                <EmberParticles />
-                <div className="hero-center">
-                    <div className="hero-logo-wrapper" id="hero-logo-wrapper">
-                        <img src="/assets/images/phoenix-logo.png" alt="Team Phoenix" className="hero-logo" id="hero-logo" />
-                        <div className="logo-glow" id="logo-glow"></div>
-                    </div>
-
-                    <h1 className="hero-title entry-anim-text1">TEAM <span className="hero-title-accent">PHOENIX</span></h1>
-                    <p className="hero-subtitle entry-anim-text2">RISE FROM THE ASHES</p>
-                    <div className="hero-cta-row entry-anim-text3">
-                        <BorderGlow
-                            edgeSensitivity={0}
-                            glowColor="20 90 65"
-                            backgroundColor="transparent"
-                            borderRadius={50}
-                            glowRadius={20}
-                            glowIntensity={1.5}
-                            coneSpread={40}
-                            animated={false}
-                            colors={['#ff3d00', '#ff9100', '#ffc400']}
-                            fillOpacity={0}
-                            className="hero-btn-glow"
-                        >
-                            <a href="#about" className="btn-primary" onClick={(e) => handleNav(e, '/about')}>ABOUT US</a>
-                        </BorderGlow>
-                        <BorderGlow
-                            edgeSensitivity={0}
-                            glowColor="20 90 65"
-                            backgroundColor="transparent"
-                            borderRadius={50}
-                            glowRadius={20}
-                            glowIntensity={1.5}
-                            coneSpread={40}
-                            animated={false}
-                            colors={['#ff3d00', '#ff9100', '#ffc400']}
-                            fillOpacity={0}
-                            className="hero-btn-glow"
-                        >
-                            <a href="#rosters" className="btn-outline" onClick={(e) => handleNav(e, '/rosters')}>VIEW ROSTER</a>
-                        </BorderGlow>
-                    </div>
-                </div>
-            </div>
+            <PhoenixHero />
 
             <div className="home-games-section" id="home-games-section">
                 <div className="home-games-inner">

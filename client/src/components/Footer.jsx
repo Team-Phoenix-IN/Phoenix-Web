@@ -4,7 +4,8 @@ export default function Footer() {
             <div className="footer-content">
                 <img src="/assets/images/phoenix-logo.png" alt="Phoenix" className="footer-logo" />
                 <p className="footer-text">
-                    &copy; 2026 Team Phoenix. All rights reserved.
+                    &copy; 2026 Team Phoenix. All rights reserved. <br/>
+                    With Love ❤️
                 </p>
             </div>
         </footer>

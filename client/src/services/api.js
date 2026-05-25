@@ -24,8 +24,8 @@ export async function apiCall(method, path, body, isFormData) {
 
 // ─── Valorant Tracker API ───
 export const HDEV_BASE = 'https://api.henrikdev.xyz';
-export const HDEV_API_KEY = 'HDEV-67ef927d-d7f2-47f4-bb92-bf8919370782';
-export const YT_API_KEY = 'AIzaSyAeiq_e8lNlG4LJarTg1i8BHuv_wTEvlz8';
+export const HDEV_API_KEY = 'YOUR_HENRIKDEV_API_KEY';
+export const YT_API_KEY = 'YOUR_YOUTUBE_API_KEY';
 export const HISTORY_KEY = 'phoenix_tracker_history';
 
 export const CREATOR_CHANNELS = [

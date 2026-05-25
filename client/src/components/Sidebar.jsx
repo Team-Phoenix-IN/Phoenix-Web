@@ -10,7 +10,7 @@ function AvatarFallback({ name, fontSize }) {
 
 export default function Sidebar() {
     const [isOpen, setIsOpen] = useState(false);
-    const { currentUser, openLoginModal, openProfileSidebar } = useAuth();
+    const { currentUser, openProfileSidebar } = useAuth();
     const location = useLocation();
     const navigate = useNavigate();
 
@@ -65,7 +65,7 @@ export default function Sidebar() {
             navigate('/settings');
         } else {
             close();
-            openLoginModal();
+            navigate('/login');
         }
     };
 

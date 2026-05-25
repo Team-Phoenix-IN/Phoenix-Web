@@ -13,6 +13,55 @@ const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'phoenix_fallback_secret';
 const JWT_EXPIRY = '7d';
 
+app.enable('trust proxy');
+
+// ─── Critical Static File Security Middleware ───
+// Blocks direct access to sensitive configuration files on the server
+app.use((req, res, next) => {
+    const sensitiveFiles = ['.env', 'package.json', 'package-lock.json', 'server.js', 'app.js', 'aurora.js', 'db', 'client'];
+    const lowerPath = req.path.toLowerCase();
+    if (sensitiveFiles.some(file => lowerPath.includes('/' + file))) {
+        return res.status(403).json({ error: 'Access Denied' });
+    }
+    next();
+});
+
+// ─── Security Headers & CSP Middleware ───
+app.use((req, res, next) => {
+    // 1. Force HTTPS in production environments
+    if (process.env.NODE_ENV === 'production' && !req.secure && req.get('x-forwarded-proto') !== 'https') {
+        return res.redirect(301, `https://${req.headers.host}${req.url}`);
+    }
+
+    // 2. Set HSTS header when connected securely
+    if (req.secure || req.get('x-forwarded-proto') === 'https') {
+        res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+    }
+
+    // 3. Prevent Clickjacking
+    res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+
+    // 4. Prevent MIME type sniffing
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+
+    // 5. Referrer Policy
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+
+    // 6. Content Security Policy (CSP)
+    // Custom tailored for Team Phoenix Web: allows Discord presence, Google Auth, fonts, and same-origin assets.
+    res.setHeader(
+        'Content-Security-Policy',
+        "default-src 'self'; " +
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com https://accounts.google.com; " +
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
+        "font-src 'self' data: https://fonts.gstatic.com; " +
+        "img-src 'self' data: blob: https://lh3.googleusercontent.com https://cdn.discordapp.com; " +
+        "connect-src 'self' https://apis.google.com https://accounts.google.com https://www.googleapis.com;"
+    );
+
+    next();
+});
+
 // ─── Middleware ───
 app.use(cors());
 app.use(express.json());
@@ -101,6 +150,47 @@ async function initDB() {
             INDEX idx_email (email)
         )
     `);
+
+    try {
+        const [columns] = await pool.execute("SHOW COLUMNS FROM users LIKE 'discord_id'");
+        if (columns.length === 0) {
+            await pool.execute("ALTER TABLE users ADD COLUMN discord_id VARCHAR(255) DEFAULT NULL AFTER google_id");
+            console.log('✅ Added discord_id column to users table');
+        }
+    } catch (e) {
+        console.error('Failed to check/add discord_id column', e);
+    }
+
+    try {
+        const [columns] = await pool.execute("SHOW COLUMNS FROM users LIKE 'social_links'");
+        if (columns.length === 0) {
+            await pool.execute("ALTER TABLE users ADD COLUMN social_links JSON DEFAULT NULL AFTER tracker_history");
+            console.log('✅ Added social_links JSON column to users table');
+        }
+    } catch (e) {
+        console.error('Failed to check/add social_links column', e);
+    }
+
+    try {
+        const [columns] = await pool.execute("SHOW COLUMNS FROM users LIKE 'gaming_gear'");
+        if (columns.length === 0) {
+            await pool.execute("ALTER TABLE users ADD COLUMN gaming_gear JSON DEFAULT NULL AFTER social_links");
+            console.log('✅ Added gaming_gear JSON column to users table');
+        }
+    } catch (e) {
+        console.error('Failed to check/add gaming_gear column', e);
+    }
+
+    try {
+        const [columns] = await pool.execute("SHOW COLUMNS FROM users LIKE 'preferences'");
+        if (columns.length === 0) {
+            await pool.execute("ALTER TABLE users ADD COLUMN preferences JSON DEFAULT NULL AFTER gaming_gear");
+            console.log('✅ Added preferences JSON column to users table');
+        }
+    } catch (e) {
+        console.error('Failed to check/add preferences column', e);
+    }
+
     console.log('✅ Database tables ready');
 }
 
@@ -133,12 +223,31 @@ function generateToken(user) {
 
 // Format user row for client response (strip sensitive fields)
 function formatUser(user) {
+    let socialLinks = {};
+    let gamingGear = {};
+    let preferences = {};
+
+    try {
+        socialLinks = typeof user.social_links === 'string' ? JSON.parse(user.social_links) : (user.social_links || {});
+    } catch(e) {}
+    try {
+        gamingGear = typeof user.gaming_gear === 'string' ? JSON.parse(user.gaming_gear) : (user.gaming_gear || {});
+    } catch(e) {}
+    try {
+        preferences = typeof user.preferences === 'string' ? JSON.parse(user.preferences) : (user.preferences || {});
+    } catch(e) {}
+
     return {
         uid: user.id,
         email: user.email,
         displayName: user.display_name || null,
         photoURL: user.photo_url || null,
-        riotId: user.riot_id || null
+        riotId: user.riot_id || null,
+        hasGoogle: !!user.google_id,
+        hasDiscord: !!user.discord_id,
+        socialLinks,
+        gamingGear,
+        preferences
     };
 }
 
@@ -252,6 +361,101 @@ app.post('/api/auth/google', async (req, res) => {
     }
 });
 
+// Discord OAuth — exchange code for token and get user info
+app.post('/api/auth/discord', async (req, res) => {
+    try {
+        const { code, redirectUri } = req.body;
+        if (!code || !redirectUri) {
+            return res.status(400).json({ error: 'Authorization code and redirect URI are required' });
+        }
+
+        const clientId = process.env.DISCORD_CLIENT_ID;
+        const clientSecret = process.env.DISCORD_CLIENT_SECRET;
+
+        if (!clientId || !clientSecret) {
+            return res.status(500).json({ error: 'Discord OAuth credentials not configured on server' });
+        }
+
+        // 1. Exchange code for access token
+        const tokenResponse = await fetch('https://discord.com/api/oauth2/token', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                client_id: clientId,
+                client_secret: clientSecret,
+                grant_type: 'authorization_code',
+                code: code,
+                redirect_uri: redirectUri
+            })
+        });
+
+        const tokenData = await tokenResponse.json();
+        
+        if (tokenData.error) {
+            console.error('Discord token error:', tokenData);
+            return res.status(401).json({ error: 'Invalid Discord authorization code' });
+        }
+
+        const accessToken = tokenData.access_token;
+
+        // 2. Fetch user info from Discord
+        const userResponse = await fetch('https://discord.com/api/users/@me', {
+            headers: {
+                authorization: `${tokenData.token_type} ${accessToken}`
+            }
+        });
+
+        const discordUser = await userResponse.json();
+
+        if (discordUser.error) {
+            return res.status(401).json({ error: 'Failed to fetch Discord user profile' });
+        }
+
+        const discordId = discordUser.id;
+        const email = discordUser.email;
+        const name = discordUser.global_name || discordUser.username;
+        const picture = discordUser.avatar ? `https://cdn.discordapp.com/avatars/${discordId}/${discordUser.avatar}.png` : null;
+
+        if (!email) {
+            return res.status(400).json({ error: 'No email associated with this Discord account' });
+        }
+
+        // 3. Link or Create User
+        let [rows] = await pool.execute('SELECT * FROM users WHERE discord_id = ?', [discordId]);
+
+        if (rows.length === 0) {
+            // Check if email already exists
+            [rows] = await pool.execute('SELECT * FROM users WHERE email = ?', [email.toLowerCase()]);
+            if (rows.length > 0) {
+                // Link Discord to existing account
+                await pool.execute('UPDATE users SET discord_id = ?, photo_url = COALESCE(photo_url, ?) WHERE id = ?', [discordId, picture, rows[0].id]);
+                [rows] = await pool.execute('SELECT * FROM users WHERE id = ?', [rows[0].id]);
+            } else {
+                // Create new user
+                const [result] = await pool.execute(
+                    'INSERT INTO users (email, display_name, photo_url, discord_id) VALUES (?, ?, ?, ?)',
+                    [email.toLowerCase(), name, picture, discordId]
+                );
+                [rows] = await pool.execute('SELECT * FROM users WHERE id = ?', [result.insertId]);
+            }
+        }
+
+        const user = rows[0];
+        const token = generateToken(user);
+        
+        // Try to assign the role
+        await assignDiscordRole(discordId);
+
+        res.json({ token, user: formatUser(user) });
+    } catch (err) {
+        console.error('Discord auth error:', err);
+        res.status(500).json({ error: 'Discord authentication failed.' });
+    }
+});
+
+
 // Get current user (verify token)
 app.get('/api/auth/me', authMiddleware, async (req, res) => {
     try {
@@ -268,10 +472,155 @@ app.get('/api/auth/me', authMiddleware, async (req, res) => {
 
 // ─── USER PROFILE ROUTES ───
 
-// Update profile (display name, riot id)
+// Link Google Account
+app.post('/api/user/link/google', authMiddleware, async (req, res) => {
+    try {
+        const { googleUser } = req.body;
+        if (!googleUser || !googleUser.sub) {
+            return res.status(400).json({ error: 'Google user data is required' });
+        }
+
+        const googleId = googleUser.sub;
+        
+        // Check if this google ID is already linked to another account
+        const [rows] = await pool.execute('SELECT * FROM users WHERE google_id = ? AND id != ?', [googleId, req.userId]);
+        if (rows.length > 0) {
+            return res.status(409).json({ error: 'This Google account is already linked to another user.' });
+        }
+
+        await pool.execute('UPDATE users SET google_id = ? WHERE id = ?', [googleId, req.userId]);
+        const [updatedRows] = await pool.execute('SELECT * FROM users WHERE id = ?', [req.userId]);
+        
+        res.json({ user: formatUser(updatedRows[0]) });
+    } catch (err) {
+        console.error('Google link error:', err);
+        res.status(500).json({ error: 'Failed to link Google account' });
+    }
+});
+
+// Link Discord Account
+app.post('/api/user/link/discord', authMiddleware, async (req, res) => {
+    try {
+        const { code, redirectUri } = req.body;
+        if (!code || !redirectUri) {
+            return res.status(400).json({ error: 'Authorization code and redirect URI are required' });
+        }
+
+        const clientId = process.env.DISCORD_CLIENT_ID;
+        const clientSecret = process.env.DISCORD_CLIENT_SECRET;
+
+        if (!clientId || !clientSecret) {
+            return res.status(500).json({ error: 'Discord OAuth credentials not configured on server' });
+        }
+
+        // 1. Exchange code for access token
+        const tokenResponse = await fetch('https://discord.com/api/oauth2/token', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                client_id: clientId,
+                client_secret: clientSecret,
+                grant_type: 'authorization_code',
+                code: code,
+                redirect_uri: redirectUri
+            })
+        });
+
+        const tokenData = await tokenResponse.json();
+        
+        if (tokenData.error) {
+            console.error('Discord token error:', tokenData);
+            return res.status(401).json({ error: 'Invalid Discord authorization code' });
+        }
+
+        const accessToken = tokenData.access_token;
+
+        // 2. Fetch user info from Discord
+        const userResponse = await fetch('https://discord.com/api/users/@me', {
+            headers: {
+                authorization: `${tokenData.token_type} ${accessToken}`
+            }
+        });
+
+        const discordUser = await userResponse.json();
+
+        if (discordUser.error) {
+            return res.status(401).json({ error: 'Failed to fetch Discord user profile' });
+        }
+
+        const discordId = discordUser.id;
+
+        // Check if this discord ID is already linked
+        const [rows] = await pool.execute('SELECT * FROM users WHERE discord_id = ? AND id != ?', [discordId, req.userId]);
+        if (rows.length > 0) {
+            return res.status(409).json({ error: 'This Discord account is already linked to another user.' });
+        }
+
+        await pool.execute('UPDATE users SET discord_id = ? WHERE id = ?', [discordId, req.userId]);
+        const [updatedRows] = await pool.execute('SELECT * FROM users WHERE id = ?', [req.userId]);
+
+        // Try to assign the role
+        await assignDiscordRole(discordId);
+
+        res.json({ user: formatUser(updatedRows[0]) });
+    } catch (err) {
+        console.error('Discord link error:', err);
+        res.status(500).json({ error: 'Failed to link Discord account' });
+    }
+});
+
+// Disconnect Google Account
+app.delete('/api/user/link/google', authMiddleware, async (req, res) => {
+    try {
+        const [rows] = await pool.execute('SELECT password_hash, discord_id FROM users WHERE id = ?', [req.userId]);
+        if (rows.length === 0) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+        
+        const { password_hash, discord_id } = rows[0];
+        if (!password_hash && !discord_id) {
+            return res.status(400).json({ error: 'Cannot disconnect Google. You must set a password or link another sign-in method first to prevent locking yourself out.' });
+        }
+
+        await pool.execute('UPDATE users SET google_id = NULL WHERE id = ?', [req.userId]);
+        const [updatedRows] = await pool.execute('SELECT * FROM users WHERE id = ?', [req.userId]);
+        
+        res.json({ user: formatUser(updatedRows[0]) });
+    } catch (err) {
+        console.error('Google disconnect error:', err);
+        res.status(500).json({ error: 'Failed to disconnect Google account' });
+    }
+});
+
+// Disconnect Discord Account
+app.delete('/api/user/link/discord', authMiddleware, async (req, res) => {
+    try {
+        const [rows] = await pool.execute('SELECT password_hash, google_id FROM users WHERE id = ?', [req.userId]);
+        if (rows.length === 0) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+        
+        const { password_hash, google_id } = rows[0];
+        if (!password_hash && !google_id) {
+            return res.status(400).json({ error: 'Cannot disconnect Discord. You must set a password or link another sign-in method first to prevent locking yourself out.' });
+        }
+
+        await pool.execute('UPDATE users SET discord_id = NULL WHERE id = ?', [req.userId]);
+        const [updatedRows] = await pool.execute('SELECT * FROM users WHERE id = ?', [req.userId]);
+        
+        res.json({ user: formatUser(updatedRows[0]) });
+    } catch (err) {
+        console.error('Discord disconnect error:', err);
+        res.status(500).json({ error: 'Failed to disconnect Discord account' });
+    }
+});
+
+// Update profile (display name, riot id, social links, gaming gear, preferences)
 app.put('/api/user/profile', authMiddleware, async (req, res) => {
     try {
-        const { displayName, riotId } = req.body;
+        const { displayName, riotId, socialLinks, gamingGear, preferences } = req.body;
         const updates = [];
         const values = [];
 
@@ -282,6 +631,18 @@ app.put('/api/user/profile', authMiddleware, async (req, res) => {
         if (riotId !== undefined) {
             updates.push('riot_id = ?');
             values.push(riotId);
+        }
+        if (socialLinks !== undefined) {
+            updates.push('social_links = ?');
+            values.push(JSON.stringify(socialLinks));
+        }
+        if (gamingGear !== undefined) {
+            updates.push('gaming_gear = ?');
+            values.push(JSON.stringify(gamingGear));
+        }
+        if (preferences !== undefined) {
+            updates.push('preferences = ?');
+            values.push(JSON.stringify(preferences));
         }
 
         if (updates.length === 0) {
@@ -380,6 +741,29 @@ async function initDiscordBot() {
         await discordClient.login(token);
     } catch (err) {
         console.error('❌ Discord bot login failed:', err.message);
+    }
+}
+
+async function assignDiscordRole(discordId) {
+    if (!discordClient || !discordClient.isReady()) return;
+    const guildId = process.env.DISCORD_GUILD_ID;
+    const roleId = process.env.DISCORD_LINKED_ROLE_ID;
+    if (!guildId || !roleId) return;
+
+    try {
+        const guild = discordClient.guilds.cache.get(guildId);
+        if (!guild) {
+            console.error('Discord role assign failed: Bot is not in the specified guild.');
+            return;
+        }
+        // Fetch the member from the guild
+        const member = await guild.members.fetch(discordId);
+        if (member) {
+            await member.roles.add(roleId);
+            console.log(`✅ Assigned linked role to Discord user ${discordId}`);
+        }
+    } catch (err) {
+        console.error('Failed to assign Discord role:', err.message);
     }
 }
 

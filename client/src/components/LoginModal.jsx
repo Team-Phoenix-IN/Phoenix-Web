@@ -29,7 +29,7 @@ export default function LoginModal() {
     };
 
     const handleGoogleLogin = () => {
-        const gcid = '740576636689-nk89bk64e21gbtu7te6htn4nkmb84482.apps.googleusercontent.com';
+        const gcid = 'YOUR_GOOGLE_CLIENT_ID';
         if (typeof google === 'undefined' || !google.accounts) {
             setErrorMsg('Google Sign-In is not available.');
             return;

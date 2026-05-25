@@ -6,7 +6,6 @@ const AuthContext = createContext();
 export function AuthProvider({ children }) {
     const [currentUser, setCurrentUser] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [loginModalOpen, setLoginModalOpen] = useState(false);
     const [profileSidebarOpen, setProfileSidebarOpen] = useState(false);
 
     // Check for existing JWT session on mount
@@ -72,6 +71,44 @@ export function AuthProvider({ children }) {
         return data.user;
     }, []);
 
+    const loginWithDiscord = useCallback(async (code, redirectUri) => {
+        const data = await apiCall('POST', '/api/auth/discord', { code, redirectUri });
+        setToken(data.token);
+        setCurrentUser(data.user);
+        return data.user;
+    }, []);
+
+    const linkGoogle = useCallback(async (tokenResponse) => {
+        const userInfoRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+            headers: { Authorization: `Bearer ${tokenResponse.access_token}` }
+        });
+        const userInfo = await userInfoRes.json();
+
+        const data = await apiCall('POST', '/api/user/link/google', {
+            googleUser: { sub: userInfo.sub }
+        });
+        setCurrentUser(data.user);
+        return data.user;
+    }, []);
+
+    const linkDiscord = useCallback(async (code, redirectUri) => {
+        const data = await apiCall('POST', '/api/user/link/discord', { code, redirectUri });
+        setCurrentUser(data.user);
+        return data.user;
+    }, []);
+
+    const unlinkGoogle = useCallback(async () => {
+        const data = await apiCall('DELETE', '/api/user/link/google');
+        setCurrentUser(data.user);
+        return data.user;
+    }, []);
+
+    const unlinkDiscord = useCallback(async () => {
+        const data = await apiCall('DELETE', '/api/user/link/discord');
+        setCurrentUser(data.user);
+        return data.user;
+    }, []);
+
     const logout = useCallback(() => {
         clearToken();
         setCurrentUser(null);
@@ -82,16 +119,14 @@ export function AuthProvider({ children }) {
         setCurrentUser(user);
     }, []);
 
-    const openLoginModal = useCallback(() => setLoginModalOpen(true), []);
-    const closeLoginModal = useCallback(() => setLoginModalOpen(false), []);
     const openProfileSidebar = useCallback(() => setProfileSidebarOpen(true), []);
     const closeProfileSidebar = useCallback(() => setProfileSidebarOpen(false), []);
 
     return (
         <AuthContext.Provider value={{
             currentUser, loading,
-            loginWithEmail, registerWithEmail, loginWithGoogle, logout, updateUser,
-            loginModalOpen, openLoginModal, closeLoginModal,
+            loginWithEmail, registerWithEmail, loginWithGoogle, loginWithDiscord,
+            linkGoogle, linkDiscord, unlinkGoogle, unlinkDiscord, logout, updateUser,
             profileSidebarOpen, openProfileSidebar, closeProfileSidebar
         }}>
             {children}

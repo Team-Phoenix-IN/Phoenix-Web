@@ -24,7 +24,7 @@ async function apiCall(method, path, body, isFormData) {
 
 let currentUser = null;
 
-const YT_API_KEY = 'AIzaSyAeiq_e8lNlG4LJarTg1i8BHuv_wTEvlz8';
+const YT_API_KEY = 'YOUR_YOUTUBE_API_KEY';
 const CREATOR_CHANNELS = [
   { channelId: 'UC6rMH3tbkLW5b8kBA-k6vWg', handle: 'ozen_gg', containerId: 'creator-ozen-videos' }
 ];
@@ -255,7 +255,7 @@ const DISCORD_CONFIG = {
   }
 
   const HDEV_BASE = 'https://api.henrikdev.xyz';
-  const HDEV_API_KEY = 'HDEV-67ef927d-d7f2-47f4-bb92-bf8919370782';
+  const HDEV_API_KEY = 'YOUR_HENRIKDEV_API_KEY';
   const HISTORY_KEY = 'phoenix_tracker_history';
 
   function getRankIconUrl(tierId) { return !tierId || tierId <= 0 ? '' : `https://media.valorant-api.com/competitivetiers/03621f52-342b-cf4e-4f86-9350a49c6d04/${tierId}/largeicon.png`; }

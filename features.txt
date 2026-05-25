@@ -1,0 +1,36 @@
+Team Phoenix Web - Features Overview
+
+1. User Authentication & Accounts
+   - Email/Password Registration and Login (secured via bcrypt hashing)
+   - Google OAuth Login integration
+   - JWT-based authentication
+   - Profile Management (Custom Display Names, Riot ID linking)
+   - Avatar Uploads (Image handling with multer)
+
+2. Backend Architecture
+   - Express.js Node Server
+   - MySQL Database integration with connection pooling
+   - Full RESTful API supporting user auth, profiles, tracking, and integrations
+
+3. Live Discord Integration
+   - Custom backend Discord bot using discord.js
+   - Live presence fetching (Online, Idle, DND status, and current activities)
+   - Real-time Frontend Discord Widget displaying member statuses
+
+4. Core Website Pages
+   - Home Page: Dynamic landing page with advanced animations
+   - Rosters Page: Showcases team players with detailed Roster Cards
+   - Creators Page: Dedicated area for team content creators
+   - Tracker Page: Game stat tracking (Valorant/Riot Games) with detailed match history modals
+   - About Page: Details and history of Team Phoenix
+   - Shop Page: Team merchandise storefront
+   - Settings Page: User preferences and account management
+
+5. Advanced UI/UX & Custom Components
+   - Built with React and Vite for fast, modern frontend performance
+   - Premium Animations: Aurora backgrounds, EmberParticles, and ChromaGrid
+   - Interactive Cards: ReflectiveCard, PixelCard, ProfileCard, and RosterCard with hover effects
+   - Custom Gaming Cursor (TargetCursor)
+   - Theme Toggle (Light/Dark mode)
+   - Responsive Navigation: Sidebars, Profile Sidebars, and top Navbars
+   - Smooth "Scroll To Top" capabilities and Modal dialogs (LoginModal, MatchDetailModal)

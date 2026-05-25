@@ -1,0 +1,173 @@
+/* ═══════════════════════════════════════════
+   PHOENIX 3D HERO — Styles
+   ═══════════════════════════════════════════ */
+
+.phoenix-hero-container {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    min-height: 600px;
+    overflow: hidden;
+    background: #050505;
+}
+
+/* ── Overlay ── */
+.phoenix-hero-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    gap: 0;
+    padding: 0 20px;
+}
+
+/* ── Logo ── */
+.phoenix-hero-logo-wrap {
+    position: relative;
+    width: clamp(160px, 28vw, 280px);
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+    animation: phxLogoEnter 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    opacity: 0;
+    transform: scale(0.4);
+}
+
+.phoenix-hero-logo-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    position: relative;
+    z-index: 2;
+    pointer-events: none;
+    user-select: none;
+    filter: drop-shadow(0 0 30px rgba(255, 87, 34, 0.35));
+}
+
+.phoenix-hero-logo-glow {
+    position: absolute;
+    width: 140%;
+    height: 140%;
+    border-radius: 50%;
+    background: radial-gradient(
+        circle,
+        rgba(255, 87, 34, 0.12) 0%,
+        rgba(255, 193, 7, 0.06) 40%,
+        transparent 70%
+    );
+    z-index: 1;
+    animation: phxGlowPulse 3.5s ease-in-out infinite;
+    pointer-events: none;
+}
+
+/* ── Headline ── */
+.phoenix-hero-headline {
+    font-family: var(--font-primary, 'Outfit', sans-serif);
+    font-size: clamp(36px, 8vw, 72px);
+    font-weight: 900;
+    letter-spacing: clamp(6px, 2.5vw, 18px);
+    text-transform: uppercase;
+    text-align: center;
+    color: #ffffff;
+    margin: 0;
+    line-height: 1.1;
+    animation: phxTextFadeUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.6s forwards;
+    opacity: 0;
+    transform: translateY(24px);
+}
+
+.phoenix-hero-headline-accent {
+    background: linear-gradient(135deg, #FF5722, #FFC107, #FF5722);
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: phxGradientShift 4s ease-in-out infinite;
+}
+
+/* ── Subheadline ── */
+.phoenix-hero-sub {
+    font-family: var(--font-primary, 'Outfit', sans-serif);
+    font-size: clamp(10px, 1.6vw, 14px);
+    font-weight: 400;
+    letter-spacing: clamp(4px, 1.5vw, 10px);
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.35);
+    margin-top: 10px;
+    text-align: center;
+    animation: phxTextFadeUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.8s forwards;
+    opacity: 0;
+    transform: translateY(24px);
+}
+
+/* ── CTA Button Row ── */
+.phoenix-hero-cta-row {
+    pointer-events: auto;
+    animation: phxTextFadeUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) 1.0s forwards;
+    opacity: 0;
+    transform: translateY(24px);
+    margin-top: 20px;
+}
+
+/* ── Animations ── */
+@keyframes phxLogoEnter {
+    0% { transform: scale(0.4); opacity: 0; }
+    60% { transform: scale(1.06); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes phxTextFadeUp {
+    0% { transform: translateY(24px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes phxGlowPulse {
+    0%, 100% { transform: scale(1); opacity: 0.6; }
+    50% { transform: scale(1.2); opacity: 1; }
+}
+
+@keyframes phxGradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+    .phoenix-hero-container {
+        min-height: 100svh;
+    }
+
+    .phoenix-hero-cta {
+        padding: 14px 40px;
+        font-size: 11px;
+        letter-spacing: 4px;
+    }
+}
+
+@media (max-width: 480px) {
+    .phoenix-hero-logo-wrap {
+        width: 140px;
+    }
+
+    .phoenix-hero-headline {
+        letter-spacing: 4px;
+    }
+
+    .phoenix-hero-sub {
+        letter-spacing: 3px;
+        font-size: 9px;
+    }
+
+    .phoenix-hero-cta {
+        padding: 12px 32px;
+        font-size: 10px;
+        letter-spacing: 3px;
+    }
+}
